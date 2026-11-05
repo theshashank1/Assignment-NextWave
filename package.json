@@ -1,0 +1,11 @@
+{
+  "name": "ai-question-workshop-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:frontend": "cd frontend && npm install && npm run build",
+    "start:backend": "cd backend && uv run uvicorn main:app --port 8000 --reload",
+    "dev:frontend": "cd frontend && npm run dev",
+    "test:backend": "cd backend && uv run python verify_endpoints.py"
+  }
+}

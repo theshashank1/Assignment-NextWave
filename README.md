@@ -97,6 +97,39 @@ npm run dev
 
 ---
 
+## Deployment (Single Unified Service)
+
+The application is architected to deploy as a **single unified web service** (FastAPI serves both the REST API and the compiled React production frontend from root `/`).
+
+### Option 1: Deploy to Render (Recommended - Free Tier)
+1. Push your repository to GitHub:
+   ```bash
+   git push origin main
+   ```
+2. Log in to [Render.com](https://render.com) and click **New +** > **Web Service**.
+3. Select your GitHub repository.
+4. Render automatically detects the multi-stage `Dockerfile` (or `render.yaml`).
+5. In **Environment Variables**, add:
+   - `GOOGLE_API_KEY`: *(Your Google Gemini API Key)*
+6. Click **Create Web Service**. Your app will be live at `https://<your-app>.onrender.com` in ~3 minutes!
+
+### Option 2: Deploy to Railway
+1. Go to [Railway.app](https://railway.app) and click **New Project** > **Deploy from GitHub repo**.
+2. Select this repository. Railway automatically builds the multi-stage `Dockerfile`.
+3. Add `GOOGLE_API_KEY` under the **Variables** tab.
+4. Under **Settings**, click **Generate Domain** to get your public live URL.
+
+### Option 3: Run with Docker Locally
+```bash
+# Build the container
+docker build -t question-workshop .
+
+# Run the container (access at http://localhost:8000)
+docker run -p 8000:8000 -e GOOGLE_API_KEY="your_api_key" question-workshop
+```
+
+---
+
 ## How Grounding Is Handled
 
 The assignment sets one crucial rule:
