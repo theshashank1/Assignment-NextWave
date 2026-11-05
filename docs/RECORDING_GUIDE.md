@@ -153,3 +153,4 @@ Open browser at `http://localhost:5173`.
 - [ ] Webcam and microphone checked
 - [ ] Browser window zoomed to ~110% for clear readability
 - [ ] Ready to record via Loom or OBS!
+
