@@ -7,6 +7,8 @@ import {
 
 export default function App() {
   const [material, setMaterial] = useState('');
+  const [loadedFileName, setLoadedFileName] = useState('python_functions_sample.md');
+  const [isDragging, setIsDragging] = useState(false);
   const [apiKey, setApiKey] = useState('');
   const [showKeyInput, setShowKeyInput] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -36,6 +38,7 @@ export default function App() {
         const data = await res.json();
         setMaterial(data.material);
         setChunks(data.chunks || []);
+        setLoadedFileName('python_functions_sample.md');
         showToast('Sample reading material on Python Functions loaded!', 'success');
       }
     } catch (e) {
@@ -43,16 +46,50 @@ export default function App() {
     }
   };
 
-  // Handle file upload
-  const handleFileUpload = (e) => {
-    const file = e.target.files?.[0];
+  // Helper to read and load a file (from drop or file picker)
+  const processFile = (file) => {
     if (!file) return;
+    if (!file.name.endsWith('.md') && !file.name.endsWith('.txt')) {
+      showToast('Please upload a markdown (.md) or text (.txt) file.', 'error');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (event) => {
       setMaterial(event.target.result);
-      showToast(`Loaded ${file.name}`, 'success');
+      setLoadedFileName(file.name);
+      showToast(`Loaded "${file.name}" successfully!`, 'success');
     };
     reader.readAsText(file);
+  };
+
+  // Handle file input change
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) processFile(file);
+    e.target.value = ''; // reset input so same file can be reloaded if needed
+  };
+
+  // Handle drag and drop events
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processFile(file);
+    }
   };
 
   // Trigger RAG Generation
@@ -327,11 +364,25 @@ export default function App() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            backgroundColor: 'var(--bg-secondary)'
+            backgroundColor: 'var(--bg-secondary)',
+            flexWrap: 'wrap',
+            gap: '8px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <FileText size={18} color="#3b82f6" />
               <h2 style={{ fontSize: '15px', fontWeight: 600 }}>Reading Material (.md)</h2>
+              {loadedFileName && (
+                <span style={{
+                  fontSize: '11px',
+                  backgroundColor: 'var(--bg-surface)',
+                  color: '#93c5fd',
+                  padding: '2px 8px',
+                  borderRadius: '6px',
+                  border: '1px solid var(--border)'
+                }}>
+                  {loadedFileName}
+                </span>
+              )}
             </div>
 
             <div style={{ display: 'flex', gap: '8px' }}>
@@ -348,7 +399,7 @@ export default function App() {
                 border: '1px solid var(--border)'
               }}>
                 <UploadCloud size={14} />
-                <span>Upload .md</span>
+                <span>Upload / Drop .md</span>
                 <input type="file" accept=".md,.txt" onChange={handleFileUpload} style={{ display: 'none' }} />
               </label>
 
@@ -372,17 +423,55 @@ export default function App() {
             </div>
           </div>
 
-          {/* Markdown Content Area */}
-          <div style={{ flex: 1, padding: '16px', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+          {/* Markdown Content Area with Drag & Drop Zone */}
+          <div 
+            onDragOver={handleDragOver}
+            onDragEnter={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            style={{ 
+              flex: 1, 
+              padding: '16px', 
+              overflowY: 'auto', 
+              display: 'flex', 
+              flexDirection: 'column',
+              position: 'relative'
+            }}
+          >
+            {isDragging && (
+              <div style={{
+                position: 'absolute',
+                top: '16px',
+                bottom: '16px',
+                left: '16px',
+                right: '16px',
+                backgroundColor: 'rgba(30, 58, 138, 0.92)',
+                border: '2px dashed #60a5fa',
+                borderRadius: '8px',
+                zIndex: 20,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#ffffff',
+                pointerEvents: 'none',
+                gap: '12px'
+              }} className="fade-in">
+                <UploadCloud size={48} color="#93c5fd" />
+                <h3 style={{ fontSize: '16px', fontWeight: 600 }}>Drop your markdown (.md) file here</h3>
+                <p style={{ fontSize: '13px', color: '#bfdbfe' }}>Release to immediately load and index for RAG generation</p>
+              </div>
+            )}
+
             <textarea
               value={material}
               onChange={(e) => setMaterial(e.target.value)}
-              placeholder="Paste markdown reading material here..."
+              placeholder="Paste markdown reading material here, or drop a .md file directly into this area..."
               style={{
                 flex: 1,
                 width: '100%',
                 backgroundColor: 'var(--bg-secondary)',
-                border: '1px solid var(--border)',
+                border: isDragging ? '1px dashed #60a5fa' : '1px solid var(--border)',
                 borderRadius: '8px',
                 padding: '16px',
                 color: '#e2e8f0',
