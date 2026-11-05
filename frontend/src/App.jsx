@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, CheckCircle2, AlertCircle, Copy, Download, 
   Edit3, Check, FileText, Code2, Layers, Key, RefreshCw, 
-  UploadCloud, ExternalLink, HelpCircle
+  UploadCloud, ArrowRight
 } from 'lucide-react';
 
 export default function App() {
@@ -23,7 +23,7 @@ export default function App() {
   // Show temporary toast message
   const showToast = (msg, type = 'info') => {
     setToast({ msg, type });
-    setTimeout(() => setToast(null), 3500);
+    setTimeout(() => setToast(null), 3000);
   };
 
   // Fetch sample reading material on initial load
@@ -39,7 +39,7 @@ export default function App() {
         setMaterial(data.material);
         setChunks(data.chunks || []);
         setLoadedFileName('python_functions_sample.md');
-        showToast('Sample reading material on Python Functions loaded!', 'success');
+        showToast('Sample material loaded (Python Functions)', 'success');
       }
     } catch (e) {
       console.error('Failed to fetch sample:', e);
@@ -57,7 +57,7 @@ export default function App() {
     reader.onload = (event) => {
       setMaterial(event.target.result);
       setLoadedFileName(file.name);
-      showToast(`Loaded "${file.name}" successfully!`, 'success');
+      showToast(`Loaded "${file.name}"`, 'success');
     };
     reader.readAsText(file);
   };
@@ -66,7 +66,7 @@ export default function App() {
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) processFile(file);
-    e.target.value = ''; // reset input so same file can be reloaded if needed
+    e.target.value = '';
   };
 
   // Handle drag and drop events
@@ -87,9 +87,7 @@ export default function App() {
     e.stopPropagation();
     setIsDragging(false);
     const file = e.dataTransfer.files?.[0];
-    if (file) {
-      processFile(file);
-    }
+    if (file) processFile(file);
   };
 
   // Trigger RAG Generation
@@ -117,7 +115,7 @@ export default function App() {
       setChunks(data.chunks || []);
       setMode(data.mode);
       setActiveTab('review');
-      showToast(`Generated 5 questions using LangChain RAG! (${data.mode})`, 'success');
+      showToast('5 questions generated via LangChain RAG!', 'success');
     } catch (err) {
       showToast(err.message, 'error');
     } finally {
@@ -198,7 +196,7 @@ export default function App() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-primary)' }}>
       {/* Toast Notification */}
       {toast && (
         <div style={{
@@ -206,18 +204,18 @@ export default function App() {
           top: '20px',
           right: '24px',
           zIndex: 100,
-          backgroundColor: toast.type === 'error' ? '#ef4444' : toast.type === 'success' ? '#10b981' : '#3b82f6',
+          backgroundColor: toast.type === 'error' ? '#dc2626' : toast.type === 'success' ? '#059669' : '#2563eb',
           color: '#ffffff',
-          padding: '12px 20px',
+          padding: '10px 16px',
           borderRadius: '8px',
-          boxShadow: '0 10px 15px -3px rgba(0,0,0,0.4)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
           fontWeight: 500,
-          fontSize: '14px',
+          fontSize: '13px',
           display: 'flex',
           alignItems: 'center',
           gap: '8px'
         }} className="fade-in">
-          {toast.type === 'error' ? <AlertCircle size={18} /> : <Check size={18} />}
+          {toast.type === 'error' ? <AlertCircle size={16} /> : <Check size={16} />}
           {toast.msg}
         </div>
       )}
@@ -226,47 +224,50 @@ export default function App() {
       <header style={{
         backgroundColor: 'var(--bg-secondary)',
         borderBottom: '1px solid var(--border)',
-        padding: '14px 28px',
+        padding: '12px 24px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '12px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
-            background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-            padding: '8px',
-            borderRadius: '10px',
+            backgroundColor: 'var(--primary-light)',
+            color: 'var(--primary)',
+            padding: '7px',
+            borderRadius: '8px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.4)'
+            border: '1px solid var(--primary-border)'
           }}>
-            <Sparkles size={22} color="#ffffff" />
+            <Sparkles size={20} />
           </div>
           <div>
-            <h1 style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              AI Question Workshop
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h1 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-main)', letterSpacing: '-0.01em' }}>
+                Question Workshop
+              </h1>
               <span style={{
                 fontSize: '11px',
                 fontWeight: 600,
                 backgroundColor: 'var(--primary-light)',
                 color: 'var(--primary)',
-                padding: '2px 8px',
-                borderRadius: '999px',
-                border: '1px solid rgba(59, 130, 246, 0.3)'
+                padding: '1px 7px',
+                borderRadius: '6px',
+                border: '1px solid var(--primary-border)'
               }}>
                 LangChain RAG
               </span>
-            </h1>
-            <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-              Turns reading material into 5 grounded questions (2 Theory MCQ, 2 T/F, 1 Code Analysis)
+            </div>
+            <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>
+              Generate 5 grounded questions (2 Theory MCQ, 2 T/F, 1 Code Analysis)
             </p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           {chunks.length > 0 && (
             <div style={{
               display: 'flex',
@@ -274,12 +275,12 @@ export default function App() {
               gap: '6px',
               fontSize: '12px',
               color: 'var(--text-muted)',
-              backgroundColor: 'var(--bg-primary)',
-              padding: '6px 12px',
+              backgroundColor: 'var(--bg-surface)',
+              padding: '5px 10px',
               borderRadius: '6px',
               border: '1px solid var(--border)'
             }}>
-              <Layers size={14} color="#3b82f6" />
+              <Layers size={14} color="#2563eb" />
               <span><strong>{chunks.length}</strong> Chunks Indexed</span>
             </div>
           )}
@@ -290,16 +291,17 @@ export default function App() {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              fontSize: '13px',
-              padding: '7px 12px',
+              fontSize: '12px',
+              padding: '6px 12px',
               borderRadius: '6px',
               backgroundColor: apiKey ? 'var(--success-bg)' : 'var(--bg-surface)',
-              color: apiKey ? 'var(--success)' : 'var(--text-main)',
-              border: `1px solid ${apiKey ? 'var(--success)' : 'var(--border)'}`
+              color: apiKey ? 'var(--success)' : 'var(--text-muted)',
+              border: `1px solid ${apiKey ? 'var(--success-border)' : 'var(--border)'}`,
+              fontWeight: 500
             }}
           >
-            <Key size={14} />
-            <span>{apiKey ? 'API Key Configured' : 'Configure Gemini Key (Optional)'}</span>
+            <Key size={13} />
+            <span>{apiKey ? 'Gemini Key Configured' : 'API Key (Optional)'}</span>
           </button>
         </div>
       </header>
@@ -307,34 +309,34 @@ export default function App() {
       {/* Optional API Key Drawer */}
       {showKeyInput && (
         <div style={{
-          backgroundColor: '#172554',
-          borderBottom: '1px solid #1e40af',
-          padding: '12px 28px',
+          backgroundColor: '#eff6ff',
+          borderBottom: '1px solid #bfdbfe',
+          padding: '10px 24px',
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
           fontSize: '13px'
         }}>
-          <Key size={16} color="#60a5fa" />
-          <span style={{ color: '#93c5fd', minWidth: '150px' }}>Google Gemini API Key:</span>
+          <Key size={15} color="#2563eb" />
+          <span style={{ color: '#1e40af', fontWeight: 500 }}>Google Gemini Key:</span>
           <input
             type="password"
-            placeholder="AIzaSy... (Leave empty for instant offline Demo Mode)"
+            placeholder="AIzaSy... (Leave empty for instant offline demo mode)"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value)}
             style={{
               flex: 1,
-              maxWidth: '460px',
-              padding: '6px 12px',
+              maxWidth: '440px',
+              padding: '6px 10px',
               borderRadius: '6px',
-              backgroundColor: 'var(--bg-primary)',
-              border: '1px solid #2563eb',
-              color: '#ffffff',
-              fontSize: '13px'
+              backgroundColor: '#ffffff',
+              border: '1px solid #93c5fd',
+              color: 'var(--text-main)',
+              fontSize: '12.5px'
             }}
           />
-          <span style={{ fontSize: '12px', color: '#93c5fd' }}>
-            Works 100% offline with pre-compiled sample if blank.
+          <span style={{ fontSize: '12px', color: '#64748b' }}>
+            Offline demo runs out-of-the-box without keys.
           </span>
         </div>
       )}
@@ -346,12 +348,12 @@ export default function App() {
         gridTemplateColumns: '1fr 1fr',
         gap: '1px',
         backgroundColor: 'var(--border)',
-        height: 'calc(100vh - 75px)',
+        height: 'calc(100vh - 65px)',
         overflow: 'hidden'
       }}>
         {/* LEFT PANEL: Reading Material Viewer & Generator */}
         <section style={{
-          backgroundColor: 'var(--bg-primary)',
+          backgroundColor: '#ffffff',
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
@@ -359,26 +361,27 @@ export default function App() {
         }}>
           {/* Panel Header */}
           <div style={{
-            padding: '14px 20px',
+            padding: '12px 20px',
             borderBottom: '1px solid var(--border)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            backgroundColor: 'var(--bg-secondary)',
+            backgroundColor: '#ffffff',
             flexWrap: 'wrap',
             gap: '8px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <FileText size={18} color="#3b82f6" />
-              <h2 style={{ fontSize: '15px', fontWeight: 600 }}>Reading Material (.md)</h2>
+              <FileText size={16} color="#2563eb" />
+              <h2 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)' }}>Reading Material</h2>
               {loadedFileName && (
                 <span style={{
                   fontSize: '11px',
                   backgroundColor: 'var(--bg-surface)',
-                  color: '#93c5fd',
+                  color: 'var(--text-muted)',
                   padding: '2px 8px',
                   borderRadius: '6px',
-                  border: '1px solid var(--border)'
+                  border: '1px solid var(--border)',
+                  fontFamily: 'var(--font-mono)'
                 }}>
                   {loadedFileName}
                 </span>
@@ -391,14 +394,15 @@ export default function App() {
                 alignItems: 'center',
                 gap: '5px',
                 fontSize: '12px',
-                padding: '6px 10px',
+                padding: '5px 10px',
                 borderRadius: '6px',
                 backgroundColor: 'var(--bg-surface)',
                 color: 'var(--text-main)',
                 cursor: 'pointer',
-                border: '1px solid var(--border)'
+                border: '1px solid var(--border)',
+                fontWeight: 500
               }}>
-                <UploadCloud size={14} />
+                <UploadCloud size={13} />
                 <span>Upload / Drop .md</span>
                 <input type="file" accept=".md,.txt" onChange={handleFileUpload} style={{ display: 'none' }} />
               </label>
@@ -410,20 +414,21 @@ export default function App() {
                   alignItems: 'center',
                   gap: '5px',
                   fontSize: '12px',
-                  padding: '6px 10px',
+                  padding: '5px 10px',
                   borderRadius: '6px',
                   backgroundColor: 'var(--bg-surface)',
                   color: 'var(--text-main)',
-                  border: '1px solid var(--border)'
+                  border: '1px solid var(--border)',
+                  fontWeight: 500
                 }}
               >
-                <RefreshCw size={13} />
+                <RefreshCw size={12} />
                 <span>Reset Sample</span>
               </button>
             </div>
           </div>
 
-          {/* Markdown Content Area with Drag & Drop Zone */}
+          {/* Markdown Content Area with Minimal Drag & Drop Zone */}
           <div 
             onDragOver={handleDragOver}
             onDragEnter={handleDragOver}
@@ -435,47 +440,48 @@ export default function App() {
               overflowY: 'auto', 
               display: 'flex', 
               flexDirection: 'column',
-              position: 'relative'
+              position: 'relative',
+              backgroundColor: '#ffffff'
             }}
           >
             {isDragging && (
               <div style={{
                 position: 'absolute',
-                top: '16px',
-                bottom: '16px',
-                left: '16px',
-                right: '16px',
-                backgroundColor: 'rgba(30, 58, 138, 0.92)',
-                border: '2px dashed #60a5fa',
+                top: '12px',
+                bottom: '12px',
+                left: '12px',
+                right: '12px',
+                backgroundColor: 'rgba(239, 246, 255, 0.95)',
+                border: '2px dashed #2563eb',
                 borderRadius: '8px',
                 zIndex: 20,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#ffffff',
+                color: 'var(--text-main)',
                 pointerEvents: 'none',
-                gap: '12px'
+                gap: '10px'
               }} className="fade-in">
-                <UploadCloud size={48} color="#93c5fd" />
-                <h3 style={{ fontSize: '16px', fontWeight: 600 }}>Drop your markdown (.md) file here</h3>
-                <p style={{ fontSize: '13px', color: '#bfdbfe' }}>Release to immediately load and index for RAG generation</p>
+                <UploadCloud size={40} color="#2563eb" />
+                <h3 style={{ fontSize: '15px', fontWeight: 600, color: '#1e40af' }}>Drop markdown file here</h3>
+                <p style={{ fontSize: '12.5px', color: '#475569' }}>Release to immediately load and index for RAG generation</p>
               </div>
             )}
 
             <textarea
               value={material}
               onChange={(e) => setMaterial(e.target.value)}
-              placeholder="Paste markdown reading material here, or drop a .md file directly into this area..."
+              placeholder="Paste reading material here, or drop a .md file directly into this area..."
               style={{
                 flex: 1,
                 width: '100%',
-                backgroundColor: 'var(--bg-secondary)',
-                border: isDragging ? '1px dashed #60a5fa' : '1px solid var(--border)',
+                backgroundColor: '#ffffff',
+                border: isDragging ? '1px dashed #2563eb' : '1px solid var(--border)',
                 borderRadius: '8px',
                 padding: '16px',
-                color: '#e2e8f0',
-                fontSize: '13.5px',
+                color: 'var(--text-main)',
+                fontSize: '13px',
                 lineHeight: 1.6,
                 fontFamily: 'var(--font-mono)',
                 resize: 'none'
@@ -485,15 +491,15 @@ export default function App() {
 
           {/* Generate Button Bar */}
           <div style={{
-            padding: '16px 20px',
+            padding: '14px 20px',
             borderTop: '1px solid var(--border)',
-            backgroundColor: 'var(--bg-secondary)',
+            backgroundColor: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between'
           }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-              <span>Rule: Produces 2 Theory MCQ, 2 T/F, 1 Code Analysis strictly grounded via RAG</span>
+            <div style={{ fontSize: '12px', color: 'var(--text-dim)' }}>
+              <span>Strict RAG: 2 Theory MCQ, 2 T/F, 1 Code Analysis</span>
             </div>
 
             <button
@@ -503,23 +509,23 @@ export default function App() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                backgroundColor: loading ? 'var(--text-dim)' : 'var(--primary)',
+                backgroundColor: loading ? '#94a3b8' : 'var(--primary)',
                 color: '#ffffff',
-                padding: '10px 20px',
-                borderRadius: '8px',
+                padding: '9px 18px',
+                borderRadius: '6px',
                 fontWeight: 600,
-                fontSize: '14px',
-                boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.4)'
+                fontSize: '13.5px',
+                boxShadow: 'var(--shadow-sm)'
               }}
             >
               {loading ? (
                 <>
-                  <RefreshCw size={16} className="spinner" />
-                  <span>LangChain RAG Processing...</span>
+                  <RefreshCw size={15} className="spinner" />
+                  <span>LangChain Processing...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles size={16} />
+                  <Sparkles size={15} />
                   <span>Generate 5 Questions</span>
                 </>
               )}
@@ -542,18 +548,19 @@ export default function App() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            backgroundColor: 'var(--bg-secondary)'
+            backgroundColor: '#ffffff'
           }}>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '6px' }}>
               <button
                 onClick={() => setActiveTab('review')}
                 style={{
-                  padding: '8px 14px',
+                  padding: '6px 12px',
                   borderRadius: '6px',
                   fontSize: '13px',
                   fontWeight: 600,
-                  backgroundColor: activeTab === 'review' ? 'var(--primary)' : 'transparent',
-                  color: activeTab === 'review' ? '#ffffff' : 'var(--text-muted)'
+                  backgroundColor: activeTab === 'review' ? 'var(--primary-light)' : 'transparent',
+                  color: activeTab === 'review' ? 'var(--primary)' : 'var(--text-muted)',
+                  border: activeTab === 'review' ? '1px solid var(--primary-border)' : '1px solid transparent'
                 }}
               >
                 Review Questions ({questions.length})
@@ -562,12 +569,13 @@ export default function App() {
               <button
                 onClick={() => setActiveTab('export')}
                 style={{
-                  padding: '8px 14px',
+                  padding: '6px 12px',
                   borderRadius: '6px',
                   fontSize: '13px',
                   fontWeight: 600,
-                  backgroundColor: activeTab === 'export' ? 'var(--primary)' : 'transparent',
-                  color: activeTab === 'export' ? '#ffffff' : 'var(--text-muted)',
+                  backgroundColor: activeTab === 'export' ? 'var(--primary-light)' : 'transparent',
+                  color: activeTab === 'export' ? 'var(--primary)' : 'var(--text-muted)',
+                  border: activeTab === 'export' ? '1px solid var(--primary-border)' : '1px solid transparent',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px'
@@ -576,9 +584,10 @@ export default function App() {
                 <span>Tagged Output</span>
                 <span style={{
                   fontSize: '10px',
-                  backgroundColor: 'var(--bg-primary)',
-                  padding: '1px 6px',
-                  borderRadius: '10px'
+                  backgroundColor: 'var(--bg-surface)',
+                  padding: '1px 5px',
+                  borderRadius: '4px',
+                  color: 'var(--text-dim)'
                 }}>
                   XML
                 </span>
@@ -603,7 +612,8 @@ export default function App() {
                       borderRadius: '5px',
                       backgroundColor: 'var(--success-bg)',
                       color: 'var(--success)',
-                      border: '1px solid var(--success)'
+                      border: '1px solid var(--success-border)',
+                      fontWeight: 500
                     }}
                   >
                     Approve All
@@ -615,7 +625,7 @@ export default function App() {
 
           {/* TAB 1: REVIEW QUESTIONS WORKSPACE */}
           {activeTab === 'review' && (
-            <div style={{ flex: 1, padding: '18px', overflowY: 'auto' }}>
+            <div style={{ flex: 1, padding: '16px', overflowY: 'auto' }}>
               {questions.length === 0 ? (
                 <div style={{
                   height: '100%',
@@ -623,15 +633,22 @@ export default function App() {
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'var(--text-muted)',
+                  color: 'var(--text-dim)',
                   textAlign: 'center',
                   padding: '40px'
                 }}>
-                  <Layers size={48} color="#475569" style={{ marginBottom: '16px' }} />
-                  <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-main)', marginBottom: '8px' }}>
+                  <div style={{
+                    backgroundColor: 'var(--bg-surface)',
+                    padding: '16px',
+                    borderRadius: '50%',
+                    marginBottom: '16px'
+                  }}>
+                    <Layers size={32} color="#64748b" />
+                  </div>
+                  <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-main)', marginBottom: '6px' }}>
                     No Questions Generated Yet
                   </h3>
-                  <p style={{ fontSize: '13px', maxWidth: '380px', marginBottom: '20px' }}>
+                  <p style={{ fontSize: '13px', maxWidth: '360px', marginBottom: '18px', color: 'var(--text-muted)' }}>
                     Click <strong>"Generate 5 Questions"</strong> on the left. The LangChain RAG pipeline will extract chunks, create 2 Theory MCQs, 2 True/False, and 1 Code Analysis question with source citations.
                   </p>
                   <button
@@ -642,14 +659,15 @@ export default function App() {
                       padding: '8px 16px',
                       borderRadius: '6px',
                       fontWeight: 600,
-                      fontSize: '13px'
+                      fontSize: '13px',
+                      boxShadow: 'var(--shadow-sm)'
                     }}
                   >
                     Generate Sample Questions Now
                   </button>
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   {questions.map((q) => (
                     <QuestionCard
                       key={q.id}
@@ -668,7 +686,7 @@ export default function App() {
 
           {/* TAB 2: TAGGED XML EXPORT */}
           {activeTab === 'export' && (
-            <div style={{ flex: 1, padding: '18px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ flex: 1, padding: '16px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -676,8 +694,8 @@ export default function App() {
                 marginBottom: '12px'
               }}>
                 <div>
-                  <h3 style={{ fontSize: '14px', fontWeight: 600 }}>Standardized Tagged Format</h3>
-                  <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                  <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-main)' }}>Standardized Tagged Format</h3>
+                  <p style={{ fontSize: '12px', color: 'var(--text-dim)' }}>
                     Export formatted question group ready for assessment ingestion
                   </p>
                 </div>
@@ -694,7 +712,8 @@ export default function App() {
                       borderRadius: '6px',
                       backgroundColor: copied ? 'var(--success)' : 'var(--primary)',
                       color: '#ffffff',
-                      fontWeight: 500
+                      fontWeight: 500,
+                      boxShadow: 'var(--shadow-sm)'
                     }}
                   >
                     {copied ? <Check size={14} /> : <Copy size={14} />}
@@ -710,9 +729,11 @@ export default function App() {
                       fontSize: '12px',
                       padding: '6px 12px',
                       borderRadius: '6px',
-                      backgroundColor: 'var(--bg-surface)',
+                      backgroundColor: '#ffffff',
                       color: 'var(--text-main)',
-                      border: '1px solid var(--border)'
+                      border: '1px solid var(--border)',
+                      fontWeight: 500,
+                      boxShadow: 'var(--shadow-sm)'
                     }}
                   >
                     <Download size={14} />
@@ -723,11 +744,11 @@ export default function App() {
 
               <pre style={{
                 flex: 1,
-                backgroundColor: 'var(--bg-secondary)',
+                backgroundColor: '#ffffff',
                 border: '1px solid var(--border)',
                 borderRadius: '8px',
                 padding: '16px',
-                color: '#38bdf8',
+                color: '#0369a1',
                 fontFamily: 'var(--font-mono)',
                 fontSize: '12.5px',
                 overflowY: 'auto',
@@ -744,7 +765,7 @@ export default function App() {
   );
 }
 
-// Subcomponent: Individual Question Review Card
+// Subcomponent: Individual Question Review Card (Light, Minimal Design)
 function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEdit, onToggleApprove }) {
   const [draft, setDraft] = useState({ ...question });
 
@@ -753,9 +774,9 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
   }, [question]);
 
   const typeColorMap = {
-    theory_mcq: { bg: 'rgba(59, 130, 246, 0.15)', text: '#60a5fa', border: 'rgba(59, 130, 246, 0.3)' },
-    true_false: { bg: 'rgba(168, 85, 247, 0.15)', text: '#c084fc', border: 'rgba(168, 85, 247, 0.3)' },
-    code_analysis: { bg: 'rgba(245, 158, 11, 0.15)', text: '#fbbf24', border: 'rgba(245, 158, 11, 0.3)' }
+    theory_mcq: { bg: '#eff6ff', text: '#1d4ed8', border: '#bfdbfe' },
+    true_false: { bg: '#faf5ff', text: '#7e22ce', border: '#e9d5ff' },
+    code_analysis: { bg: '#fffbeb', text: '#b45309', border: '#fde68a' }
   };
 
   const currentType = typeColorMap[question.type] || typeColorMap.theory_mcq;
@@ -763,13 +784,14 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
   if (isEditing) {
     return (
       <div style={{
-        backgroundColor: 'var(--bg-secondary)',
+        backgroundColor: '#ffffff',
         border: '1px solid var(--primary)',
-        borderRadius: '10px',
-        padding: '18px',
+        borderRadius: '8px',
+        padding: '16px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px'
+        gap: '12px',
+        boxShadow: 'var(--shadow-card)'
       }} className="fade-in">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--primary)' }}>
@@ -778,13 +800,13 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
           <div style={{ display: 'flex', gap: '8px' }}>
             <button
               onClick={onCancelEdit}
-              style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '5px', backgroundColor: 'var(--bg-surface)' }}
+              style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '5px', backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border)' }}
             >
               Cancel
             </button>
             <button
               onClick={() => onSaveEdit(draft)}
-              style={{ fontSize: '12px', padding: '4px 12px', borderRadius: '5px', backgroundColor: 'var(--success)', color: '#fff', fontWeight: 600 }}
+              style={{ fontSize: '12px', padding: '4px 12px', borderRadius: '5px', backgroundColor: 'var(--primary)', color: '#fff', fontWeight: 600 }}
             >
               Save Changes
             </button>
@@ -792,18 +814,18 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
         </div>
 
         <div>
-          <label style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Question Prompt:</label>
+          <label style={{ fontSize: '11px', color: 'var(--text-dim)', display: 'block', marginBottom: '4px', fontWeight: 500 }}>Question Prompt:</label>
           <textarea
             value={draft.prompt}
             onChange={(e) => setDraft({ ...draft, prompt: e.target.value })}
             style={{
               width: '100%',
-              backgroundColor: 'var(--bg-primary)',
+              backgroundColor: '#ffffff',
               border: '1px solid var(--border)',
               borderRadius: '6px',
               padding: '8px',
               fontSize: '13px',
-              color: '#fff',
+              color: 'var(--text-main)',
               minHeight: '60px'
             }}
           />
@@ -811,19 +833,19 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
 
         {draft.type === 'code_analysis' && (
           <div>
-            <label style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Code Snippet:</label>
+            <label style={{ fontSize: '11px', color: 'var(--text-dim)', display: 'block', marginBottom: '4px', fontWeight: 500 }}>Code Snippet:</label>
             <textarea
               value={draft.code_snippet}
               onChange={(e) => setDraft({ ...draft, code_snippet: e.target.value })}
               style={{
                 width: '100%',
-                backgroundColor: 'var(--bg-primary)',
+                backgroundColor: 'var(--bg-surface)',
                 border: '1px solid var(--border)',
                 borderRadius: '6px',
                 padding: '8px',
                 fontSize: '12.5px',
                 fontFamily: 'var(--font-mono)',
-                color: '#38bdf8',
+                color: '#0369a1',
                 minHeight: '70px'
               }}
             />
@@ -831,7 +853,7 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
         )}
 
         <div>
-          <label style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Options & Correct Answer:</label>
+          <label style={{ fontSize: '11px', color: 'var(--text-dim)', display: 'block', marginBottom: '4px', fontWeight: 500 }}>Options & Correct Answer:</label>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {draft.options?.map((opt, idx) => (
               <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -847,7 +869,7 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
                     setDraft({ ...draft, options: updatedOptions, correct_answer: opt.key });
                   }}
                 />
-                <span style={{ fontSize: '12px', fontWeight: 600, minWidth: '24px' }}>{opt.key}:</span>
+                <span style={{ fontSize: '12px', fontWeight: 600, minWidth: '24px', color: 'var(--text-main)' }}>{opt.key}:</span>
                 <input
                   type="text"
                   value={opt.text}
@@ -858,11 +880,12 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
                   }}
                   style={{
                     flex: 1,
-                    backgroundColor: 'var(--bg-primary)',
+                    backgroundColor: '#ffffff',
                     border: '1px solid var(--border)',
                     borderRadius: '6px',
                     padding: '6px 10px',
-                    fontSize: '12.5px'
+                    fontSize: '12.5px',
+                    color: 'var(--text-main)'
                   }}
                 />
               </div>
@@ -871,18 +894,18 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
         </div>
 
         <div>
-          <label style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>Explanation:</label>
+          <label style={{ fontSize: '11px', color: 'var(--text-dim)', display: 'block', marginBottom: '4px', fontWeight: 500 }}>Explanation:</label>
           <textarea
             value={draft.explanation}
             onChange={(e) => setDraft({ ...draft, explanation: e.target.value })}
             style={{
               width: '100%',
-              backgroundColor: 'var(--bg-primary)',
+              backgroundColor: '#ffffff',
               border: '1px solid var(--border)',
               borderRadius: '6px',
               padding: '8px',
               fontSize: '12.5px',
-              color: '#fff',
+              color: 'var(--text-main)',
               minHeight: '50px'
             }}
           />
@@ -893,14 +916,15 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
 
   return (
     <div style={{
-      backgroundColor: 'var(--bg-secondary)',
-      border: `1px solid ${question.is_approved ? 'var(--success)' : 'var(--border)'}`,
-      borderRadius: '10px',
+      backgroundColor: '#ffffff',
+      border: `1px solid ${question.is_approved ? 'var(--success-border)' : 'var(--border)'}`,
+      borderLeft: question.is_approved ? '4px solid var(--success)' : '1px solid var(--border)',
+      borderRadius: '8px',
       padding: '16px',
       display: 'flex',
       flexDirection: 'column',
-      gap: '12px',
-      position: 'relative'
+      gap: '11px',
+      boxShadow: 'var(--shadow-card)'
     }} className="fade-in">
       {/* Top Header of Card */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
@@ -909,8 +933,8 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
             fontSize: '11px',
             fontWeight: 700,
             textTransform: 'uppercase',
-            letterSpacing: '0.04em',
-            padding: '3px 8px',
+            letterSpacing: '0.03em',
+            padding: '2px 8px',
             borderRadius: '4px',
             backgroundColor: currentType.bg,
             color: currentType.text,
@@ -924,11 +948,11 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            padding: '3px 8px',
+            padding: '2px 8px',
             borderRadius: '4px',
             backgroundColor: 'var(--success-bg)',
             color: 'var(--success)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
+            border: '1px solid var(--success-border)',
             fontWeight: 500
           }}>
             <CheckCircle2 size={12} />
@@ -936,7 +960,7 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <button
             onClick={onStartEdit}
             style={{
@@ -947,7 +971,7 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
               padding: '4px 8px',
               borderRadius: '5px',
               backgroundColor: 'var(--bg-surface)',
-              color: 'var(--text-main)',
+              color: 'var(--text-muted)',
               border: '1px solid var(--border)'
             }}
           >
@@ -960,37 +984,37 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '5px',
+              gap: '4px',
               fontSize: '12px',
               fontWeight: 600,
               padding: '4px 10px',
               borderRadius: '5px',
-              backgroundColor: question.is_approved ? 'var(--success)' : 'var(--bg-surface)',
+              backgroundColor: question.is_approved ? 'var(--success)' : '#ffffff',
               color: question.is_approved ? '#ffffff' : 'var(--text-muted)',
               border: `1px solid ${question.is_approved ? 'var(--success)' : 'var(--border)'}`
             }}
           >
-            <Check size={14} />
+            <Check size={13} />
             <span>{question.is_approved ? 'Approved' : 'Approve'}</span>
           </button>
         </div>
       </div>
 
       {/* Prompt */}
-      <p style={{ fontSize: '14px', fontWeight: 500, color: '#f1f5f9', lineHeight: 1.5 }}>
+      <p style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-main)', lineHeight: 1.5 }}>
         {question.prompt}
       </p>
 
       {/* Code Snippet if applicable */}
       {question.code_snippet && (
         <div style={{
-          backgroundColor: '#090d16',
-          border: '1px solid #1e293b',
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border)',
           borderRadius: '6px',
           padding: '10px 14px',
           fontFamily: 'var(--font-mono)',
           fontSize: '12.5px',
-          color: '#38bdf8',
+          color: '#0369a1',
           whiteSpace: 'pre-wrap'
         }}>
           {question.code_snippet}
@@ -1006,23 +1030,23 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
               display: 'flex',
               alignItems: 'flex-start',
               gap: '10px',
-              padding: '8px 12px',
+              padding: '7px 12px',
               borderRadius: '6px',
-              backgroundColor: opt.is_correct ? 'rgba(16, 185, 129, 0.12)' : 'var(--bg-primary)',
-              border: `1px solid ${opt.is_correct ? 'rgba(16, 185, 129, 0.4)' : 'var(--border)'}`
+              backgroundColor: opt.is_correct ? 'var(--success-bg)' : '#ffffff',
+              border: `1px solid ${opt.is_correct ? 'var(--success-border)' : 'var(--border)'}`
             }}
           >
             <span style={{
               fontSize: '11px',
               fontWeight: 700,
-              padding: '2px 6px',
+              padding: '1px 6px',
               borderRadius: '4px',
               backgroundColor: opt.is_correct ? 'var(--success)' : 'var(--bg-surface)',
-              color: '#ffffff'
+              color: opt.is_correct ? '#ffffff' : 'var(--text-muted)'
             }}>
               {opt.key}
             </span>
-            <span style={{ fontSize: '13px', color: opt.is_correct ? '#34d399' : 'var(--text-main)', flex: 1 }}>
+            <span style={{ fontSize: '13px', color: opt.is_correct ? '#065f46' : 'var(--text-main)', flex: 1 }}>
               {opt.text}
             </span>
             {opt.is_correct && (
@@ -1039,8 +1063,8 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
         <div style={{
           fontSize: '12.5px',
           color: 'var(--text-muted)',
-          backgroundColor: 'var(--bg-primary)',
-          padding: '10px 12px',
+          backgroundColor: 'var(--bg-surface)',
+          padding: '8px 12px',
           borderRadius: '6px',
           borderLeft: '3px solid var(--primary)'
         }}>
@@ -1052,19 +1076,20 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
       <div style={{
         fontSize: '11.5px',
         color: 'var(--text-dim)',
-        backgroundColor: '#0c1322',
-        padding: '8px 12px',
+        backgroundColor: '#f8fafc',
+        border: '1px solid var(--border)',
+        padding: '7px 12px',
         borderRadius: '6px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '4px'
+        gap: '3px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Layers size={13} color="#38bdf8" />
-          <strong style={{ color: '#93c5fd' }}>RAG Source Chunk:</strong> {question.source_chunk}
+          <Layers size={13} color="#2563eb" />
+          <strong style={{ color: 'var(--text-main)' }}>RAG Source Chunk:</strong> {question.source_chunk}
         </div>
         {question.source_quote && (
-          <div style={{ fontStyle: 'italic', color: '#cbd5e1' }}>
+          <div style={{ fontStyle: 'italic', color: 'var(--text-muted)' }}>
             "{question.source_quote}"
           </div>
         )}
@@ -1072,4 +1097,3 @@ function QuestionCard({ question, isEditing, onStartEdit, onCancelEdit, onSaveEd
     </div>
   );
 }
-
