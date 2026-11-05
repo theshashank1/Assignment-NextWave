@@ -6,9 +6,12 @@ import os
 import json
 import re
 from typing import List, Dict, Any, Optional
+from dotenv import load_dotenv
 from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
 from langchain_core.prompts import ChatPromptTemplate
 from sample_material import SAMPLE_QUESTIONS, SAMPLE_READING_MATERIAL
+
+load_dotenv()
 
 
 def chunk_material_with_langchain(markdown_text: str) -> List[Dict[str, Any]]:
@@ -111,8 +114,9 @@ Do not wrap in markdown quotes if possible, output pure JSON.
         ("user", "Here are the retrieved reading material chunks:\n\n{context}\n\nGenerate the 5-question group now:")
     ])
 
-    # Try models in order of availability
-    for model_name in ["gemini-2.0-flash", "gemini-1.5-flash"]:
+    # Try models in order of availability and stability
+    candidate_models = ["gemini-3.5-flash", "gemini-3.8-flash", "gemini-flash-latest"]
+    for model_name in candidate_models:
         try:
             llm = ChatGoogleGenerativeAI(
                 model=model_name,
@@ -121,13 +125,23 @@ Do not wrap in markdown quotes if possible, output pure JSON.
             )
             chain = prompt_template | llm
             response = chain.invoke({"context": context_str})
-            content = response.content.strip()
+            
+            raw_content = response.content
+            if isinstance(raw_content, list):
+                content = "".join([b["text"] for b in raw_content if isinstance(b, dict) and "text" in b])
+            else:
+                content = str(raw_content)
+            content = content.strip()
 
-            # Clean JSON if wrapped in markdown code fence
+            # Clean JSON if wrapped in markdown code fence or extract JSON array
             if "```json" in content:
                 content = content.split("```json")[1].split("```")[0].strip()
             elif "```" in content:
                 content = content.split("```")[1].split("```")[0].strip()
+            else:
+                json_match = re.search(r"\[\s*\{.*\}\s*\]", content, re.DOTALL)
+                if json_match:
+                    content = json_match.group(0)
 
             data = json.loads(content)
             if isinstance(data, list) and len(data) == 5:

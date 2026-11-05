@@ -46,9 +46,12 @@ class ExportRequest(BaseModel):
 
 @app.get("/")
 def health_check():
+    has_key = bool(os.getenv("GOOGLE_API_KEY", "").strip())
     return {
         "status": "online",
         "service": "AI Question Workshop (LangChain RAG)",
+        "has_api_key": has_key,
+        "active_model": "gemini-3.5-flash" if has_key else "offline_sample",
         "docs_url": "/docs"
     }
 
@@ -56,11 +59,14 @@ def health_check():
 @app.get("/api/sample")
 def get_sample():
     """Returns the bundled Python Functions reading material."""
+    has_key = bool(os.getenv("GOOGLE_API_KEY", "").strip())
     chunks = chunk_material_with_langchain(SAMPLE_READING_MATERIAL)
     return {
         "topic": "Python Functions: Arguments, Return Values, and Scope",
         "material": SAMPLE_READING_MATERIAL,
-        "chunks": chunks
+        "chunks": chunks,
+        "has_api_key": has_key,
+        "active_model": "gemini-3.5-flash" if has_key else "offline_sample"
     }
 
 

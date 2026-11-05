@@ -10,6 +10,8 @@ export default function App() {
   const [loadedFileName, setLoadedFileName] = useState('python_functions_sample.md');
   const [isDragging, setIsDragging] = useState(false);
   const [apiKey, setApiKey] = useState('');
+  const [hasEnvKey, setHasEnvKey] = useState(false);
+  const [activeModel, setActiveModel] = useState('');
   const [showKeyInput, setShowKeyInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState([]);
@@ -39,6 +41,8 @@ export default function App() {
         setMaterial(data.material);
         setChunks(data.chunks || []);
         setLoadedFileName('python_functions_sample.md');
+        setHasEnvKey(Boolean(data.has_api_key));
+        setActiveModel(data.active_model || 'gemini-3.5-flash');
         showToast('Sample material loaded (Python Functions)', 'success');
       }
     } catch (e) {
@@ -115,7 +119,8 @@ export default function App() {
       setChunks(data.chunks || []);
       setMode(data.mode);
       setActiveTab('review');
-      showToast('5 questions generated via LangChain RAG!', 'success');
+      const isLive = data.mode === 'live_gemini';
+      showToast(isLive ? 'Generated 5 questions using Live Gemini API!' : 'Generated 5 questions (Offline demo)', 'success');
     } catch (err) {
       showToast(err.message, 'error');
     } finally {
@@ -268,6 +273,29 @@ export default function App() {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Live Engine Status Pill */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '12px',
+            color: (hasEnvKey || apiKey) ? '#059669' : '#64748b',
+            backgroundColor: (hasEnvKey || apiKey) ? '#ecfdf5' : 'var(--bg-surface)',
+            padding: '5px 10px',
+            borderRadius: '6px',
+            border: `1px solid ${(hasEnvKey || apiKey) ? '#a7f3d0' : 'var(--border)'}`,
+            fontWeight: 500
+          }}>
+            <span style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: (hasEnvKey || apiKey) ? '#10b981' : '#94a3b8',
+              display: 'inline-block'
+            }}></span>
+            <span>{(hasEnvKey || apiKey) ? 'Gemini Live (gemini-3.5-flash)' : 'Offline Demo Mode'}</span>
+          </div>
+
           {chunks.length > 0 && (
             <div style={{
               display: 'flex',
@@ -294,14 +322,14 @@ export default function App() {
               fontSize: '12px',
               padding: '6px 12px',
               borderRadius: '6px',
-              backgroundColor: apiKey ? 'var(--success-bg)' : 'var(--bg-surface)',
-              color: apiKey ? 'var(--success)' : 'var(--text-muted)',
-              border: `1px solid ${apiKey ? 'var(--success-border)' : 'var(--border)'}`,
+              backgroundColor: (apiKey || hasEnvKey) ? 'var(--success-bg)' : 'var(--bg-surface)',
+              color: (apiKey || hasEnvKey) ? 'var(--success)' : 'var(--text-muted)',
+              border: `1px solid ${(apiKey || hasEnvKey) ? 'var(--success-border)' : 'var(--border)'}`,
               fontWeight: 500
             }}
           >
             <Key size={13} />
-            <span>{apiKey ? 'Gemini Key Configured' : 'API Key (Optional)'}</span>
+            <span>{(apiKey || hasEnvKey) ? 'API Key Active' : 'API Key (Optional)'}</span>
           </button>
         </div>
       </header>
@@ -668,6 +696,22 @@ export default function App() {
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  {mode && (
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      backgroundColor: mode === 'live_gemini' ? '#ecfdf5' : '#f8fafc',
+                      border: `1px solid ${mode === 'live_gemini' ? '#a7f3d0' : 'var(--border)'}`,
+                      padding: '8px 14px',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      color: mode === 'live_gemini' ? '#065f46' : 'var(--text-muted)'
+                    }}>
+                      <span><strong>Engine:</strong> {mode === 'live_gemini' ? 'Google Gemini API (gemini-3.5-flash)' : 'Built-in Demo Sample'}</span>
+                      <span style={{ fontSize: '11px', color: 'var(--text-dim)' }}>RAG Grounded: 5 Questions</span>
+                    </div>
+                  )}
                   {questions.map((q) => (
                     <QuestionCard
                       key={q.id}
